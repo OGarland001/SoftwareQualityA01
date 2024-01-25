@@ -11,8 +11,8 @@
 # Number of CPUs
 # requirements.txt to hold all the package versions needed to run the script.
 
-import os, platform, psutil, xlrd, pandas as pd
-
+import os, platform, psutil, xlrd, pandas as pd, time
+import concurrent.futures
 def display_system_properties():
     print("="*20, "System Properties", "="*20)
     cpuCount = os.cpu_count()
@@ -40,7 +40,39 @@ def basicCalculationMillion():
         result += i
     print(result)
 
+def workerCalculation(count):
+    print('Worker Calculates')
+    result = 0
+    for i in range(int(count)):
+        result += i
+    print(result)
+
+
+def multiThreadedCalculation():
+    maxProcessors = 8
+    
+    print("="*20, "MultiThreaded Calculation", "="*20)
+    pool = concurrent.futures.ThreadPoolExecutor(max_workers=maxProcessors)
+    count = 1000000/maxProcessors
+    for i in range(maxProcessors):
+        pool.submit(workerCalculation(count))
+
+    pool.shutdown(wait=True)
+
+
+
+
+
 spreadsheetPrinter('inputData.xlsx')
+start = time.time()
 basicCalculationMillion()
+end = time.time()
+elapsed_time = end - start
+print('Execution Time:', elapsed_time, ' seconds')
+start = time.time()
+multiThreadedCalculation()
+end = time.time()
+elapsed_time = end - start
+print('Execution Time:', elapsed_time, ' seconds')
 display_system_properties()
 
