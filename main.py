@@ -47,32 +47,29 @@ def workerCalculation(count):
         result += i
     print(result)
 
-
 def multiThreadedCalculation():
     maxProcessors = 8
-    
+
     print("="*20, "MultiThreaded Calculation", "="*20)
-    pool = concurrent.futures.ThreadPoolExecutor(max_workers=maxProcessors)
-    count = 1000000/maxProcessors
-    for i in range(maxProcessors):
-        pool.submit(workerCalculation(count))
+    count = 1000000 / maxProcessors
 
-    pool.shutdown(wait=True)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=maxProcessors) as pool:
+        futures = [pool.submit(workerCalculation, count) for _ in range(maxProcessors)]
+        concurrent.futures.wait(futures)
 
+if __name__ == '__main__':
+    spreadsheetPrinter('inputData.xlsx')
 
+    start = time.time()
+    basicCalculationMillion()
+    end = time.time()
+    elapsed_time = end - start
+    print('Execution Time:', elapsed_time, ' seconds')
 
+    start = time.time()
+    multiThreadedCalculation()
+    end = time.time()
+    elapsed_time = end - start
+    print('Execution Time:', elapsed_time, ' seconds')
 
-
-spreadsheetPrinter('inputData.xlsx')
-start = time.time()
-basicCalculationMillion()
-end = time.time()
-elapsed_time = end - start
-print('Execution Time:', elapsed_time, ' seconds')
-start = time.time()
-multiThreadedCalculation()
-end = time.time()
-elapsed_time = end - start
-print('Execution Time:', elapsed_time, ' seconds')
-display_system_properties()
-
+    display_system_properties()
